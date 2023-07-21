@@ -26,7 +26,7 @@ static bool r_completing = false;
 static bool r_enteringEditMessage = false; 
 // r stands for reset (of the clock)
 
-/********************************************************************************************************/
+/*********************************************************************************************************/
 
 void welcomeMessage() {
     cout << COLOR_CYAN << "\n\n\t\t- - - - - Welcome to TODOIZERRR v1.0! - - - - -\n" << RESET_COLOR;
