@@ -1,7 +1,7 @@
-CC = g++
-CFLAGS = -Wall 
+CXX = g++
+CXXFLAGS = -Wall 
 
 all: main
 
 main: todoizerrr.cpp todoizerrr.o
-	$(CC) $(CFLAGS) todoizerrr.cpp -o todoizerrr.exe
+	$(CXX) $(CXXFLAGS) todoizerrr.cpp -o todoizerrr.exe
