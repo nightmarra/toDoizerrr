@@ -285,10 +285,10 @@ string displayTime(bool displayNow) {
         }
     }
 
-    splitter[0] = strtok_r(currentTime.data(), " :", &save);
+    splitter[0] = strtok_s(currentTime.data(), " :", &save);
     for(int i = 1; i < 7; ++i) {
         if(splitter != NULL) {
-            splitter[i] = strtok_r(NULL, " :", &save);
+            splitter[i] = strtok_s(NULL, " :", &save);
         }        
     }
 
