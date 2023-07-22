@@ -17,17 +17,20 @@
 #define RESET_COLOR "\033[0m"
 
 
-void welcomeMessage();
+inline void welcomeMessage();
+inline void invalidInput();
+
 void tasksFromFile();
 void transferToCopy(std::string readFromHere, std::string writeToHere);
 void displayTasksAndOptions();
 void todoizer();
-void invalidInput();
-int taskCreator();
 void taskEditor();
 void taskComplete();
-std::string getTime();
-std::string displayTime(bool displayNow);
 void concurrentTime();
 void showTime();
 void showEverything();
+
+int taskCreator();
+
+std::string getTime();
+std::string displayTime(bool displayNow);

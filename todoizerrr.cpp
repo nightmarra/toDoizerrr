@@ -17,19 +17,20 @@
 #include <thread>
 #include "todoizerrr.hpp"
 
-using std::cout, std::cin, std::string, std::getline, std::getchar, std::vector, std::ifstream, std::ofstream, std::map;
+using std::cout, std::cin, std::string, std::getline, std::ifstream, std::ofstream;
 
-vector<string> allTasks;
+// global variables here
+std::vector<string> allTasks;
 static bool r_creating = false;
 static bool r_editing = false;
 static bool r_completing = false;
 static bool r_enteringEditMessage = false; 
-// r stands for reset (of the clock)
+// r_ stands for reset (of the clock)
 
 /*********************************************************************************************************/
 
-void welcomeMessage() {
-    cout << COLOR_CYAN << "\n\n\t\t- - - - - Welcome to TODOIZERRR v1.0! - - - - -\n" << RESET_COLOR;
+inline void welcomeMessage() {
+    cout << COLOR_CYAN << "\n\n\t\t- - - - - Welcome to TODOIZERRR v1.1! - - - - -\n" << RESET_COLOR;
     cout << COLOR_GREEN << "Your tasks: \n" << RESET_COLOR;
 }
 
@@ -48,22 +49,19 @@ void tasksFromFile() {
 }
 
 void transferToCopy(string readFromHere, string writeToHere) {
+    string content;
     ifstream auxFile(readFromHere);
     ofstream auxCopy(writeToHere);
 
-    string content;
-    int i;
-
-    for(i = 0; !auxFile.eof(); ++i) {
+    for(int i = 0; !auxFile.eof(); ++i) {
         content += auxFile.get();
     }
+
     auxFile.close();
 
     content.erase(content.end() - 1);
-
     auxCopy << content;          
     auxCopy.close();
-
 }
 
 
@@ -79,13 +77,13 @@ void displayTasksAndOptions() {
     cout << '\n' << BOLD << "Options: \n" << RESET_COLOR;
     cout << "  > Create a new task ('" << COLOR_YELLOW << "c" << RESET_COLOR << "') \n";
     cout << "  > Edit an existing task ('" << COLOR_YELLOW << "e" << RESET_COLOR << "') \n";
-    cout << "  > Mark task as completed ('" << COLOR_YELLOW << "m" << RESET_COLOR << "') \n";
+    cout << "  > Mark task as completed ('" << COLOR_YELLOW << "m" << RESET_COLOR << "') \n\n";
 }
 
 void todoizer() {
     string option;
+
     cout << "\n: ";
-    
     getline(cin, option);
     char o = toupper(option[0]);
 
@@ -123,10 +121,11 @@ void todoizer() {
             invalidInput();
             break;
     }
+
     todoizer();
 }
 
-void invalidInput() {
+inline void invalidInput() {
     cout << "Invalid input.";
 }
 
@@ -134,6 +133,7 @@ int taskCreator() {
     string newTask;
     ofstream auxFile(FILE1, std::ios_base::app);
     ofstream auxCopy(FILE2, std::ios_base::app);
+
     r_creating = true;
 
     while(newTask == "") {
@@ -154,6 +154,7 @@ int taskCreator() {
         }
         allTasks.push_back(newTask);
     }
+
     r_creating = false;
 
     auxFile.close();
@@ -162,13 +163,14 @@ int taskCreator() {
 }
 
 void taskEditor() {
-    transferToCopy(FILE1, FILE2);
-
     float num;
     string editedTask;
     ofstream auxFile(FILE1, std::ios_base::trunc);
 
+    transferToCopy(FILE1, FILE2);
+
     r_editing = true;
+
     cout << "\nWhich task do you want to edit? (type a number): ";
 
     while(1) {
@@ -209,7 +211,9 @@ void taskEditor() {
             }
         }
     }
+
     r_enteringEditMessage = false;
+
     auxFile.close();
     transferToCopy(FILE1, FILE2);
 }
@@ -219,6 +223,7 @@ void taskComplete() {
     ofstream auxFile(FILE1, std::ios_base::trunc);
 
     cout << "\nWhich task have you completed? (type a number): ";
+
     r_completing = true;
 
     while(1) {
@@ -253,7 +258,9 @@ void taskComplete() {
             }
         }
     }
+
     r_completing = false;
+
     auxFile.close();
     transferToCopy(FILE1, FILE2);
 }
@@ -262,12 +269,13 @@ string getTime() {
     auto t = std::chrono::system_clock::now();
     std::time_t c_t = std::chrono::system_clock::to_time_t(t);
     string currentTime = string(std::ctime(&c_t));
-    currentTime[currentTime.length() - 1] = '\0';
 
+    currentTime[currentTime.length() - 1] = '\0';
     return currentTime;
 }
 
 string displayTime(bool displayNow) {
+    char* save;
     char* splitter[7];
     string currentTime = getTime();
 
@@ -277,14 +285,14 @@ string displayTime(bool displayNow) {
         }
     }
 
-    splitter[0] = strtok(currentTime.data(), " :");
+    splitter[0] = strtok_r(currentTime.data(), " :", &save);
     for(int i = 1; i < 7; ++i) {
         if(splitter != NULL) {
-            splitter[i] = strtok(NULL, " :");
+            splitter[i] = strtok_r(NULL, " :", &save);
         }        
     }
 
-    map<string, string>Days;
+    std::map<string, string>Days;
     Days["Mon"] = "Monday";
     Days["Tue"] = "Tuesday";
     Days["Wed"] = "Wednesday";
@@ -293,7 +301,7 @@ string displayTime(bool displayNow) {
     Days["Sat"] = "Saturday";
     Days["Sun"] = "Sunday";
 
-    map<string, string>Months;
+    std::map<string, string>Months;
     Months["Jan"] = "January";
     Months["Feb"] = "February";
     Months["Mar"] = "March";
@@ -314,16 +322,15 @@ string displayTime(bool displayNow) {
     Days[splitter[0]] +" | " +
     splitter[3] + ":" + 
     splitter[4];
-
     return timeLine;
 }
 
 void concurrentTime() {
     while(1) {
         string time = displayTime(false);
+
         if(time != "") {
             CLEAR_TERMINAL
-
             cout << time << COLOR_RED << "\t\t\t  type " 
             << RESET_COLOR << "'" 
             << COLOR_YELLOW << "x" 
@@ -333,6 +340,7 @@ void concurrentTime() {
 
             welcomeMessage();
             displayTasksAndOptions();
+
             if(r_creating) {
                 cout << "\nWhat do you need to do?: ";
             } else if(r_editing) {
@@ -345,21 +353,21 @@ void concurrentTime() {
                 cout << "\n: ";
             }
         }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
 void showTime() {
-    CLEAR_TERMINAL
     string time = displayTime(true);
 
+    CLEAR_TERMINAL
     cout << time << COLOR_RED << "\t\t\t  type " 
             << RESET_COLOR << "'" 
             << COLOR_YELLOW << "x" 
             << RESET_COLOR << "'" 
             << COLOR_RED << " to exit\n" 
             << RESET_COLOR;
-
 }
 
 void showEverything() {
@@ -371,11 +379,12 @@ void showEverything() {
 int main() {
     ofstream auxFile(FILE1, std::ios_base::app);
     ofstream auxCopy(FILE2, std::ios_base::app);
+
     auxFile.close();
     auxCopy.close();
 
     cout << "Press Enter... ";
-    getchar();
+    std::getchar();
 
     transferToCopy(FILE2, FILE1);
 
@@ -387,6 +396,5 @@ int main() {
 
     t1.join();
     t2.join();
-    
     return 0;
 }
